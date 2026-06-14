@@ -8,9 +8,15 @@ venv/
 ENV/
 
 # Storage and DuckDB database files
-storage/
+storage/*
+!storage/.gitkeep
+
 *.db
 *.db.wal
+
+# Output directory
+src/output/*
+!src/output/.gitkeep
 
 # macOS system files
 .DS_Store
