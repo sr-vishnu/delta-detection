@@ -14,6 +14,59 @@ contains the versioned history of entities, providing a clear trail of how an en
 load -> process -> transform -> validate -> write output
 ```
 
+
+```text
+                 Input JSONL files
+                          |
+                          v
+                  +---------------+
+                  |     load      |
+                  +---------------+
+                          |
+                          v
+        +--------------------------------------+
+        |              raw layer               |
+        |                                      |
+        |  raw_customer_profile                |
+        |  raw_membership                      |
+        |                                      |
+        |  immutable append-only log           |
+        +--------------------------------------+
+                          |
+                          v
+                  +---------------+
+                  |    process    |
+                  +---------------+
+                          |
+                          v
+        +--------------------------------------+
+        |             entity layer             |
+        |                                      |
+        |  customer_profile                    |
+        |  membership                          |
+        |                                      |
+        |  versioned entity history            |
+        +--------------------------------------+
+                          |
+                          v
+                  +---------------+
+                  |   transform   |
+                  +---------------+
+                          |
+                          v
+                  +---------------+
+                  |    validate   |
+                  +---------------+
+                          |
+                          v
+                  +---------------+
+                  | write output  |
+                  +---------------+
+                          |
+                          v
+              sync.jsonl + verification.jsonl
+```
+
 ### load
 
 loads data into the raw layer.
