@@ -67,25 +67,15 @@ load -> process -> transform -> validate -> write output
               sync.jsonl + verification.jsonl
 ```
 
-### load
+**load**: loads data into the raw layer.
 
-loads data into the raw layer.
+**process**: builds and maintains the entity layer.
 
-### process
+**transform**: transforms the entity data into a form suitable for validation and output generation.
 
-builds and maintains the entity layer.
+**validate**: validates the transformed data against contracts expressed as Pydantic models.
 
-### transform
-
-transforms the entity data into a form suitable for validation and output generation.
-
-### validate
-
-validates the transformed data against contracts expressed as Pydantic models.
-
-### write output
-
-writes the `sync.jsonl` and `verification.jsonl` files.
+**write output**: writes the `sync.jsonl` and `verification.jsonl` files.
 
 ## Setup
 
