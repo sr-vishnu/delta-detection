@@ -1,6 +1,7 @@
-import click
+
 import os
 import sys
+import click
 from modules.utils.executor import DuckDBSQLExecutor
 
 # Add src to path to allow importing modules
