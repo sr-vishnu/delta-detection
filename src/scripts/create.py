@@ -1,10 +1,10 @@
 import os
 import sys
+from src.modules.utils.executor import DuckDBSQLExecutor
 
 # Add src to path to allow importing modules
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(SCRIPT_DIR, '..'))
-from modules.utils.executor import DuckDBSQLExecutor
+
 
 def create_tables():
     # Calculate project root: two levels up from src/scripts/
@@ -20,12 +20,12 @@ def create_tables():
         os.path.join(DDL_ENTITY_DIR, 'membership.sql')
     ]
 
-    for ddl_path in DDL_FILES:
+    for _path in DDL_FILES:
         try:
-            print(f"Executing DDL: {ddl_path}")
-            DuckDBSQLExecutor.execute(ddl_path)
+            print(f"executing: {_path}")
+            DuckDBSQLExecutor.execute(_path)
         except Exception as e:
-            print(f"Error occurred while executing {ddl_path}: {e}")
+            print(f"error happend while {_path}: {e}")
             raise
 
 if __name__ == "__main__":
