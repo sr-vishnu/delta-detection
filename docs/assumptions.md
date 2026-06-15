@@ -1,0 +1,32 @@
+- Although not explicitly mentioned in the requirements, I decided to split ingestion into two separate stages: **load** and **process**.
+
+  The **load** stage is responsible for loading batches of data into the raw layer. Maintaining a raw layer is a common best practice, as it serves as an immutable append-only log that can be used to replay and reconstruct all downstream layers if needed. In this specific case, it is also useful for achieving idempotence, since the processing pipeline only needs to consider rows from the raw layer that have not been processed previously.
+
+  During the load stage, several system columns are added, as they are required by subsequent steps:
+
+  - **ingestion_timestamp** – Timestamp at which the batch was loaded. This value is the same for all records within a batch.
+  - **batch_id** – Identifier of the batch being loaded.
+  - **batch_offset** – Position of the record within the batch.
+  - **payload_hash** – SHA-256 hash of the business payload, used during processing to determine whether two records are equivalent.
+  - **metadata** – System-level information associated with the record. Since it has no business significance, it is excluded from hash generation.
+
+- It should also be noted that the load and process stages are intentionally decoupled. In principle, multiple batches may be loaded into the raw layer before the processing pipeline is executed. This is done to better reflect typical data engineering workflows.
+
+  As implemented currently, the overall flow is:
+
+  ```text
+  load -> process -> transform -> validate -> write o/p
+  ```
+
+- I have also decided not to focus heavily on partitioning at this stage. This decision is based on two considerations.
+
+  First, it is reasonable to assume that the data velocity for the `customer_profile` and `membership` entities is relatively low. Even with datasets in the millions of records, a reasonably sized machine should be able to handle them without introducing partitioning complexity.
+
+  Second, the use of JSONL as both the input and output format suggests that the volume of data being written to the sync-ready files is not expected to be particularly large.
+
+  For these reasons, I have chosen not to introduce partitioning at the moment. Potential partitioning strategies and related considerations have been included in the **Improvements** section.
+
+
+- The sample output contains a `rank_id` field, but I was unable to find a corresponding `rank_id` attribute in the membership source data. The source does, however, contain a `rank_name`, which has been included in the output instead.
+
+- The validation specification states that two users should not share the same email address, but it does not specify how such conflicts should be handled. Possible approaches could include removing all conflicting records, keeping only the first occurrence, keeping only the last occurrence, or invalidating the entire output. Since the expected behavior is not defined, I decided not to enforce this constraint.
