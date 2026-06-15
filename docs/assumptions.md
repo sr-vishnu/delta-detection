@@ -10,6 +10,14 @@
   - **payload_hash** – SHA-256 hash of the business payload, used during processing to determine whether two records are equivalent.
   - **metadata** – System-level information associated with the record. Since it has no business significance, it is excluded from hash generation.
 
+  Similarly, the **process** stage enriches the final entity tables with several additional system columns used to track entity state and changes over time:
+
+  - **status** – Indicates whether a row represents the current version of an entity (`CURRENT`) or a previous version (`HISTORICAL`).
+  - **action** – Describes the type of change represented by the row. Newly observed entities are marked as `INSERT`, existing entities whose business payload has changed are marked as `UPDATE`, and records whose payload is identical to the previous version are marked as `NOOP`.
+  - **delta** – Indicates whether a row belongs to the delta produced by the most recent processing run. Rows corresponding to `INSERT` and `UPDATE` actions are marked as `TRUE`. Before each processing run, previously calculated delta flags are invalidated, ensuring that the delta always represents the difference between the current state of the entity tables and the newly processed batch. Consequently, a row that was part of a previous delta may no longer be considered part of the current delta if no new changes affecting that entity are observed.
+  - **valid_from** – Timestamp from which a particular version of the entity becomes valid. This corresponds to the `ingestion_timestamp` of the record.
+  - **valid_to** – Timestamp at which a particular version ceases to be valid. This is derived from the `ingestion_timestamp` of the next chronological version of the same entity. For rows representing the current version, this value is `NULL`.
+
 - It should also be noted that the load and process stages are intentionally decoupled. In principle, multiple batches may be loaded into the raw layer before the processing pipeline is executed. This is done to better reflect typical data engineering workflows.
 
   As implemented currently, the overall flow is:
