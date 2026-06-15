@@ -1,4 +1,4 @@
-- The processing algorithm described in `algo.processing.md`, which is currently implemented under `delta-validation/sql/processing/*`, could be further generalized into a single `processing.sql.j2` template and reused across different entities.
+- The processing algorithm described in `algo.processing.md`, which is currently implemented under `delta-validation/sql/processing/*`, could be further generalized into a single `processing.sql.j2` template and reused across different entities. A `DBT macro` is a greate candidate for this.
 
   This is possible because the same set of system columns (`status`, `action`, `delta`, `valid_from`, and `valid_to`) is added to all entities, and the logic used to derive these columns is identical.
 
