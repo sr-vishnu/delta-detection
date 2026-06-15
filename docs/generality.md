@@ -1,4 +1,4 @@
-- Most of the design decisions in this project were made with the goal of keeping the solution reasonably generic and scalable. The following sections discuss each stage of the pipeline:
+Most of the design decisions in this project were made with the goal of keeping the solution reasonably generic and scalable. The following sections discuss each stage of the pipeline:
 
 ### load
 
