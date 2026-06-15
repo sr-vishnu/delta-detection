@@ -60,6 +60,8 @@ SET
 FROM new_batch_first_times n
 WHERE membership.membership.source_id = n.source_id
   AND membership.membership.source_type = n.source_type
+  AND membership.membership.program_id = n.program_id
+  AND membership.membership.membership_id = n.membership_id
   AND membership.status = 'CURRENT';
 
 -- we fetch the raw data which is greater than the watermark from the raw table and expand the payload into indiviual cols
@@ -74,7 +76,9 @@ WITH new_raw_data AS (
         payload_hash,
         metadata,
         payload->>'$.source_type' AS source_type,
-        payload->>'$.source_id' AS source_id, 
+        payload->>'$.source_id' AS source_id,
+        payload->>'$.program_id' AS program_id,
+        payload->>'$.membership_id' AS membership_id,
 json_transform(
     payload,
     '{
@@ -94,6 +98,8 @@ json_transform(
         ingestion_timestamp > (SELECT val FROM watermark_holder)
         AND NULLIF(TRIM(payload->>'$.source_id'), '') IS NOT NULL
         AND NULLIF(TRIM(payload->>'$.source_type'), '') IS NOT NULL
+        AND NULLIF(TRIM(payload->>'$.program_id'), '') IS NOT NULL
+        AND NULLIF(TRIM(payload->>'$.membership_id'), '') IS NOT NULL
 ),
 
 -- the ingestion pipeline and the entity processing pipeline are intentionally
