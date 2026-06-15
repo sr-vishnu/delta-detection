@@ -9,9 +9,12 @@ DB_PATH = os.path.join(PROJECT_ROOT, "storage", "storage.db")
 
 class DuckDBSQLExecutor:
     @staticmethod
-    def execute(sql_file_path):
-        with open(sql_file_path, "r") as f:
-            sql_query = f.read()
+    def execute(sql_source):
+        if os.path.isfile(sql_source):
+            with open(sql_source, "r") as f:
+                sql_query = f.read()
+        else:
+            sql_query = sql_source
 
         con = duckdb.connect(DB_PATH)
         try:

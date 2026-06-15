@@ -2,6 +2,8 @@
 
   The **load** stage is responsible for loading batches of data into the raw layer. Maintaining a raw layer is a common best practice, as it serves as an immutable append-only log that can be used to replay and reconstruct all downstream layers if needed. In this specific case, it is also useful for achieving idempotence, since the processing pipeline only needs to consider rows from the raw layer that have not been processed previously.
 
+  Idempotence is enforced at the load stage by checking for the existence of the `batch_id` (date) in the target raw table before proceeding with ingestion. If the query `SELECT 1 FROM {TARGET_TABLE} WHERE batch_id = '{date}' LIMIT 1` returns any results, the script identifies that the batch has already been loaded and skips the ingestion process.
+
   During the load stage, several system columns are added, as they are required by subsequent steps:
 
   - **ingestion_timestamp** – Timestamp at which the batch was loaded. This value is the same for all records within a batch.

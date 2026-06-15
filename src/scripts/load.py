@@ -29,6 +29,15 @@ def ingest(table, date):
     TARGET_TABLE = table
     SUB_DIR = table_to_dir[table]
     
+    # Idempotence check at the ingestion layer.
+    # If this batch already exists in the raw table,
+    # skip ingestion to avoid loading the same batch more than once.
+    check_query = f"SELECT 1 FROM {TARGET_TABLE} WHERE batch_id = '{date}' LIMIT 1"
+    existing_batch = DuckDBSQLExecutor.execute(check_query)
+    if not existing_batch.empty:
+        print(f"batch already exist")
+        return
+
     # Calculate project root: two levels up from src/scripts/
     PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
     FILE_PATH = os.path.join(PROJECT_ROOT, 'src', 'data', SUB_DIR, date, 'batch.jsonl')
