@@ -5,37 +5,41 @@ Algorithm: Ingest JSONL batch into raw entity table
    - Get the batch date from the CLI.
    - Resolve the target raw table using the entity type.
 
-2. Locate the source file
+2. Check for existing batch (Idempotence)
+   - Query the target raw table for the given batch date (batch_id).
+   - If records for this batch already exist, skip ingestion to avoid duplicates.
+
+3. Locate the source file
    - Build the file path using:
      - entity type
      - batch date
      - `batch.jsonl`
 
-3. Read the JSONL file
+4. Read the JSONL file
    - Read each line as one JSON record.
    - Load all records into a dataframe.
 
-4. Add ingestion metadata
+5. Add ingestion metadata
    - Set one shared `ingestion_timestamp` for the whole batch.
    - Set `batch_id` from the batch date.
    - Set `batch_offset` from the row position inside the file.
 
-5. Extract source metadata
+6. Extract source metadata
    - Move `etl_metadata` into the raw table `metadata` column.
    - If `etl_metadata` is missing or invalid, use `{}`.
    - Exclude `etl_metadata` from the business payload.
 
-6. Build payload
+7. Build payload
    - Exclude ingestion-generated columns and metadata columns.
    - Convert the remaining business fields into a sorted JSON string.
    - Store this as `payload`.
 
-7. Generate payload hash
+8. Generate payload hash
    - Run SHA-256 on the payload JSON string.
    - Store the result as `payload_hash`.
    - This hash is later used to detect payload equality.
 
-8. Select raw table columns
+9. Select raw table columns
    - Keep only:
      - `ingestion_timestamp`
      - `batch_id`
@@ -44,10 +48,10 @@ Algorithm: Ingest JSONL batch into raw entity table
      - `metadata`
      - `payload`
 
-9. Insert into DuckDB
+10. Insert into DuckDB
    - Connect to the configured DuckDB database.
    - Insert the dataframe into the target raw table.
 
-10. Close connection
-   - Print ingestion result.
-   - Close the DuckDB connection.
+11. Close connection
+    - Print ingestion result.
+    - Close the DuckDB connection.
