@@ -90,6 +90,8 @@ writes the `sync.jsonl` and `verification.jsonl` files.
 ## Setup
 
 ```bash
+git clone git@github.com:sr-vishnu/delta-detection.git
+cd delta-detection
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
