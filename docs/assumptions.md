@@ -40,3 +40,9 @@
 - The sample output contains a `rank_id` field, but I was unable to find a corresponding `rank_id` attribute in the membership source data. The source does, however, contain a `rank_name`, which has been included in the output instead.
 
 - The validation specification states that two users should not share the same email address, but it does not specify how such conflicts should be handled. Possible approaches could include removing all conflicting records, keeping only the first occurrence, keeping only the last occurrence, or invalidating the entire output. Since the expected behavior is not defined, I decided not to enforce this constraint.
+
+
+`POST SUBMISSION MARKER` -> clearly separates stuff added after submission is made
+date -> 2026/06/16
+
+- i have made the assumption that all rows with status = `CURRENT` are the ones which get exported into the jsonl files , but it could also be the case that whats requried is delta = True, theres some room for interpretaion here but its easily doable by adding a few tweeks to the `transforms/transformation.sql`

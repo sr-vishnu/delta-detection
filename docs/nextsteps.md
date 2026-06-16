@@ -42,3 +42,10 @@
   which would allow the storage engine to perform partition pruning and only read the partition containing the current records, instead of scanning all historical data.
 
   In other words, we are exploiting the fact that current rows are heavily queried while historical rows are rarely touched.
+
+  `POST SUBMISSION MARKER` -> clearly separates stuff added after submission is made
+  date -> 2026/06/16
+
+    - I revisited the idea of partitioning based on `valid_to`. As mentioned previously, this approach tends to create many small partitions. Thinking about it more broadly, I believe a simpler approach would work better: partitioning based on `status` itself. This keeps things clean and results in only two partitions: `CURRENT` and `HISTORICAL`.
+
+    - Partitioning by `valid_to` may make sense for high-velocity event data, where time-based pruning is important, but for entity data, partitioning by `status` feels like a much more practical and maintainable choice.
