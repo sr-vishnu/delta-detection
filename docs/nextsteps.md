@@ -49,3 +49,11 @@
     - I revisited the idea of partitioning based on `valid_to`. As mentioned previously, this approach tends to create many small partitions. Thinking about it more broadly, I believe a simpler approach would work better: partitioning based on `status` itself. This keeps things clean and results in only two partitions: `CURRENT` and `HISTORICAL`.
 
     - Partitioning by `valid_to` may make sense for high-velocity event data, where time-based pruning is important, but for entity data, partitioning by `status` feels like a much more practical and maintainable choice.
+
+    - Another thing worth adding, which also makes change detection much easier for rows where `action = 'UPDATED'`, is a `diff` column of type `JSON`. This column would contain a patch conforming to the [RFC 6902 JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902) specification, allowing us to clearly identify exactly what changed and how. This is particularly useful for CDC-style downstream workflows.
+
+    - For rows with `action = 'INSERTED'`, this field can contain an empty JSON array (`[]`).
+    - For rows with `action = 'UPDATED'`, this field contains the JSON Patch describing the changes between the previous and current versions.
+    - For rows with `action = 'NOOP'`, this field could simply carry forward the same patch from the most recent occurrence of the  same entity whose action was either `INSERTED` or `UPDATED`.
+
+    - This approach allows downstream consumers to reason not only about *whether* a row changed, but also *what* changed, without having to compare entire payloads themselves.
